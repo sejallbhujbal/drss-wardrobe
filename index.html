@@ -18,7 +18,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <!-- PWA -->
-<link rel="manifest" href="manifest.json">
+<link rel="manifest" href="data:application/json,{%22name%22:%22DRSS%20%E2%80%94%20Your%20Smart%20Wardrobe%22,%22short_name%22:%22DRSS%22,%22start_url%22:%22/drss-wardrobe/%22,%22display%22:%22standalone%22,%22background_color%22:%22%23F7F3EE%22,%22theme_color%22:%22%231C1C1E%22,%22icons%22:[{%22src%22:%22https://sejallbhujbal.github.io/drss-wardrobe/icon-192.png%22,%22sizes%22:%22192x192%22,%22type%22:%22image/png%22}]}">
 <meta name="theme-color" content="#1C1C1E">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -985,7 +985,7 @@ async function generateOutfit() {
   const prompt = `You are a professional fashion stylist.\n${weatherContext}\nWardrobe:\n${wList}\nOccasion: ${selectedOccasion}\n\nPick 2-4 items that work best together. Return ONLY valid JSON:\n{"title":"short poetic name (5 words max)","items":["exact names from wardrobe"],"advice":"2-3 sentences of specific styling advice","harmonyScore":85}`;
 
   try {
-    const res = await fetch('https://corsproxy.io/?' + encodeURIComponent('https://api.anthropic.com/v1/messages'), {
+    const res = await fetch('https://api.allorigins.win/raw?url=' + encodeURIComponent('https://api.anthropic.com/v1/messages'), {
       method:'POST', headers:{'Content-Type':'application/json'},
       body:JSON.stringify({ model:'claude-sonnet-4-6', max_tokens:800, messages:[{role:'user',content:prompt}] })
     });
@@ -1169,7 +1169,7 @@ async function rateCombo() {
   const list = pieces.map(p=>`- "${p.name}" (${p.category}, ${p.color}, ${p.style})`).join('\n');
   const prompt = `You are a fashion stylist. Rate this outfit combination:\n${list}\n\nReturn ONLY valid JSON:\n{"title":"creative outfit name (5 words max)","advice":"2-3 sentences about what works and what to improve","harmonyScore":75}`;
   try {
-    const res = await fetch('https://corsproxy.io/?' + encodeURIComponent('https://api.anthropic.com/v1/messages'), {
+    const res = await fetch('https://api.allorigins.win/raw?url=' + encodeURIComponent('https://api.anthropic.com/v1/messages'), {
       method:'POST', headers:{'Content-Type':'application/json'},
       body:JSON.stringify({ model:'claude-sonnet-4-6', max_tokens:600, messages:[{role:'user',content:prompt}] })
     });
