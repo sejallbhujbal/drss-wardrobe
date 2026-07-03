@@ -985,7 +985,7 @@ async function generateOutfit() {
   const prompt = `You are a professional fashion stylist.\n${weatherContext}\nWardrobe:\n${wList}\nOccasion: ${selectedOccasion}\n\nPick 2-4 items that work best together. Return ONLY valid JSON:\n{"title":"short poetic name (5 words max)","items":["exact names from wardrobe"],"advice":"2-3 sentences of specific styling advice","harmonyScore":85}`;
 
   try {
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
+    const res = await fetch('https://corsproxy.io/?' + encodeURIComponent('https://api.anthropic.com/v1/messages'), {
       method:'POST', headers:{'Content-Type':'application/json'},
       body:JSON.stringify({ model:'claude-sonnet-4-6', max_tokens:800, messages:[{role:'user',content:prompt}] })
     });
@@ -1169,7 +1169,7 @@ async function rateCombo() {
   const list = pieces.map(p=>`- "${p.name}" (${p.category}, ${p.color}, ${p.style})`).join('\n');
   const prompt = `You are a fashion stylist. Rate this outfit combination:\n${list}\n\nReturn ONLY valid JSON:\n{"title":"creative outfit name (5 words max)","advice":"2-3 sentences about what works and what to improve","harmonyScore":75}`;
   try {
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
+    const res = await fetch('https://corsproxy.io/?' + encodeURIComponent('https://api.anthropic.com/v1/messages'), {
       method:'POST', headers:{'Content-Type':'application/json'},
       body:JSON.stringify({ model:'claude-sonnet-4-6', max_tokens:600, messages:[{role:'user',content:prompt}] })
     });
@@ -1300,8 +1300,6 @@ function toast(msg) {
 // ══════════════════════════════════════════════════════════
 // PWA INSTALL POPUP
 // ══════════════════════════════════════════════════════════
-let deferredPrompt = null;
-
 window.addEventListener('beforeinstallprompt', e => {
   e.preventDefault();
   deferredPrompt = e;
@@ -1343,7 +1341,8 @@ window.addEventListener('appinstalled', () => {
 // ══════════════════════════════════════════════════════════
 // AI CHAT STYLIST
 // ══════════════════════════════════════════════════════════
-let chatHistory = [];
+var chatHistory = [];
+var deferredPrompt = null;
 
 function sendSuggestion(btn) {
   document.getElementById('chat-input').value = btn.textContent.trim();
@@ -1499,8 +1498,6 @@ if ('serviceWorker' in navigator) {
 
 <script>
 // ── PWA INSTALL PROMPT ────────────────────────────────────
-let deferredPrompt = null;
-
 window.addEventListener('beforeinstallprompt', e => {
   e.preventDefault();
   deferredPrompt = e;
