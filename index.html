@@ -17,6 +17,13 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- PWA -->
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#1C1C1E">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="DRSS">
+<link rel="apple-touch-icon" href="icon-192.png">
 <title>DRSS — Your Smart Wardrobe</title>
 <meta name="description" content="DRSS is your smart digital wardrobe — add your clothes, get AI-styled outfit suggestions for any occasion, mix and match pieces, and track your favourite looks.">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%231C1C1E'/%3E%3Ctext x='50' y='68' font-size='52' text-anchor='middle' fill='%23C98B7A' font-family='Georgia,serif'%3ED%3C/text%3E%3C/svg%3E">
@@ -221,6 +228,34 @@ nav{display:flex;justify-content:space-between;align-items:center;padding:16px 4
 /* TOAST */
 .toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--charcoal);color:white;padding:12px 24px;border-radius:30px;font-size:.87rem;z-index:9999;transition:transform .3s ease;pointer-events:none}
 .toast.show{transform:translateX(-50%) translateY(0)}
+
+
+
+.install-popup{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(200px);background:var(--warm-white);border:1px solid var(--border);border-radius:20px;padding:20px 24px;width:calc(100% - 48px);max-width:380px;box-shadow:0 8px 40px rgba(0,0,0,.15);z-index:9998;transition:transform .4s ease;display:flex;align-items:center;gap:16px}
+.install-popup.show{transform:translateX(-50%) translateY(0)}
+.install-app-icon{width:52px;height:52px;border-radius:12px;background:var(--charcoal);display:flex;align-items:center;justify-content:center;font-family:"Playfair Display",serif;font-size:1.3rem;color:var(--dusty-rose);flex-shrink:0}
+.install-text{flex:1}
+.install-text h4{font-size:.9rem;font-weight:600;margin-bottom:2px}
+.install-text p{font-size:.75rem;color:var(--mid-gray);line-height:1.4}
+.install-actions{display:flex;flex-direction:column;gap:6px;flex-shrink:0}
+.btn-install{background:var(--charcoal);color:white;border:none;border-radius:20px;padding:7px 16px;font-size:.78rem;font-weight:500;cursor:pointer;font-family:"DM Sans",sans-serif;white-space:nowrap}
+.btn-install:hover{background:#333}
+.btn-dismiss{background:none;border:none;color:var(--mid-gray);font-size:.75rem;cursor:pointer;font-family:"DM Sans",sans-serif;text-align:center}
+.btn-dismiss:hover{color:var(--charcoal)}
+
+
+/* ── INSTALL POPUP ── */
+.install-popup{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(200px);background:var(--warm-white);border:1px solid var(--border);border-radius:20px;padding:20px 24px;width:calc(100% - 40px);max-width:380px;box-shadow:0 8px 40px rgba(0,0,0,.15);z-index:9998;transition:transform .4s cubic-bezier(.34,1.56,.64,1);display:flex;align-items:center;gap:16px}
+.install-popup.show{transform:translateX(-50%) translateY(0)}
+.install-popup-icon{width:52px;height:52px;background:var(--charcoal);border-radius:12px;display:flex;align-items:center;justify-content:center;font-family:"Playfair Display",serif;font-size:1.3rem;color:var(--dusty-rose);flex-shrink:0;letter-spacing:.05em}
+.install-popup-text{flex:1}
+.install-popup-text h4{font-size:.9rem;font-weight:500;margin-bottom:2px}
+.install-popup-text p{font-size:.75rem;color:var(--mid-gray)}
+.install-popup-actions{display:flex;flex-direction:column;gap:6px;flex-shrink:0}
+.btn-install{background:var(--charcoal);color:white;border:none;border-radius:20px;padding:7px 16px;font-size:.78rem;font-weight:500;cursor:pointer;font-family:"DM Sans",sans-serif;white-space:nowrap}
+.btn-install:hover{background:#333}
+.btn-dismiss{background:none;border:none;font-size:.75rem;color:var(--mid-gray);cursor:pointer;font-family:"DM Sans",sans-serif;text-align:center}
+.btn-dismiss:hover{color:var(--charcoal)}
 
 @media(max-width:700px){
   nav{padding:14px 18px}
@@ -1186,5 +1221,135 @@ function toast(msg) {
   toastTimer=setTimeout(()=>el.classList.remove('show'),2500);
 }
 </script>
+
+<script>
+
+// ══════════════════════════════════════════════════════════
+// PWA INSTALL POPUP
+// ══════════════════════════════════════════════════════════
+let deferredPrompt = null;
+
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  deferredPrompt = e;
+  // Show popup after 3 seconds
+  setTimeout(() => {
+    if (!localStorage.getItem('drss-install-dismissed')) {
+      document.getElementById('install-popup').classList.add('show');
+    }
+  }, 3000);
+});
+
+document.getElementById('btn-install').addEventListener('click', async () => {
+  if (deferredPrompt) {
+    deferredPrompt.prompt();
+    const { outcome } = await deferredPrompt.userChoice;
+    if (outcome === 'accepted') {
+      toast('DRSS installed! 🎉 Check your home screen!');
+    }
+    deferredPrompt = null;
+  } else {
+    // iOS fallback
+    toast('Tap Share → "Add to Home Screen" to install! 😊');
+  }
+  document.getElementById('install-popup').classList.remove('show');
+  localStorage.setItem('drss-install-dismissed', '1');
+});
+
+function dismissInstall() {
+  document.getElementById('install-popup').classList.remove('show');
+  localStorage.setItem('drss-install-dismissed', '1');
+}
+
+window.addEventListener('appinstalled', () => {
+  toast('DRSS installed successfully! 🎉');
+  document.getElementById('install-popup').classList.remove('show');
+});
+
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/drss-wardrobe/sw.js')
+      .then(reg => console.log('SW registered'))
+      .catch(err => console.log('SW error', err));
+  });
+}
+</script>
+<!-- ── INSTALL POPUP ── -->
+<div class="install-popup" id="install-popup">
+  <div class="install-app-icon">DR</div>
+  <div class="install-text">
+    <h4>Install DRSS 📱</h4>
+    <p>Add to your home screen for the best app experience!</p>
+  </div>
+  <div class="install-actions">
+    <button class="btn-install" id="install-btn">Install App</button>
+    <button class="btn-dismiss" onclick="dismissInstall()">Not now</button>
+  </div>
+</div>
+
+<script>
+// ── PWA INSTALL PROMPT ────────────────────────────────────
+let deferredPrompt = null;
+
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  deferredPrompt = e;
+  // Show popup after 3 seconds
+  setTimeout(() => {
+    if (!localStorage.getItem('drss-install-dismissed')) {
+      document.getElementById('install-popup').classList.add('show');
+    }
+  }, 3000);
+});
+
+document.getElementById('install-btn').addEventListener('click', async () => {
+  if (deferredPrompt) {
+    deferredPrompt.prompt();
+    const { outcome } = await deferredPrompt.userChoice;
+    if (outcome === 'accepted') {
+      dismissInstall();
+    }
+    deferredPrompt = null;
+  } else {
+    // iOS fallback instructions
+    alert('To install DRSS:\n\n📱 iPhone: Tap the Share button (↑) then "Add to Home Screen"\n\n🤖 Android: Tap the 3 dots menu then "Add to Home Screen"');
+    dismissInstall();
+  }
+});
+
+function dismissInstall() {
+  document.getElementById('install-popup').classList.remove('show');
+  localStorage.setItem('drss-install-dismissed', 'true');
+}
+
+// Reset dismiss after 7 days so it shows again
+const dismissed = localStorage.getItem('drss-install-dismissed');
+if (dismissed) {
+  const sevenDays = 7 * 24 * 60 * 60 * 1000;
+  // Already handled by showing popup
+}
+
+// On iOS — show popup differently since beforeinstallprompt doesn't fire
+const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+const isInStandaloneMode = window.matchMedia('(display-mode: standalone)').matches;
+if (isIOS && !isInStandaloneMode && !localStorage.getItem('drss-install-dismissed')) {
+  setTimeout(() => {
+    document.getElementById('install-popup').classList.add('show');
+  }, 3000);
+}
+</script>
+
+<!-- ═══ INSTALL POPUP ═══ -->
+<div class="install-popup" id="install-popup">
+  <div class="install-popup-icon">DR</div>
+  <div class="install-popup-text">
+    <h4>Install DRSS App 📱</h4>
+    <p>Add to your home screen for the best experience!</p>
+  </div>
+  <div class="install-popup-actions">
+    <button class="btn-install" id="btn-install">Install</button>
+    <button class="btn-dismiss" onclick="dismissInstall()">Not now</button>
+  </div>
+</div>
 </body>
 </html>
