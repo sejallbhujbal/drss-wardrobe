@@ -257,6 +257,40 @@ nav{display:flex;justify-content:space-between;align-items:center;padding:16px 4
 .btn-dismiss{background:none;border:none;font-size:.75rem;color:var(--mid-gray);cursor:pointer;font-family:"DM Sans",sans-serif;text-align:center}
 .btn-dismiss:hover{color:var(--charcoal)}
 
+
+/* ── AI CHAT STYLIST ── */
+.chat-wrap{display:flex;flex-direction:column;height:calc(100vh - 200px);min-height:500px}
+.chat-messages{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:14px;padding:4px 0 20px;scroll-behavior:smooth}
+.chat-msg{display:flex;gap:12px;align-items:flex-end;max-width:85%}
+.chat-msg.user{align-self:flex-end;flex-direction:row-reverse}
+.chat-msg.bot{align-self:flex-start}
+.chat-avatar{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.85rem;flex-shrink:0;font-family:"Playfair Display",serif;font-weight:700}
+.chat-avatar.bot-av{background:var(--charcoal);color:var(--dusty-rose)}
+.chat-avatar.user-av{background:var(--blush);color:var(--charcoal)}
+.chat-bubble{padding:12px 16px;border-radius:18px;font-size:.88rem;line-height:1.6;max-width:100%}
+.chat-msg.bot .chat-bubble{background:var(--warm-white);border:1px solid var(--border);border-bottom-left-radius:4px}
+.chat-msg.user .chat-bubble{background:var(--charcoal);color:var(--warm-white);border-bottom-right-radius:4px}
+.chat-bubble .outfit-cards{display:flex;flex-direction:column;gap:8px;margin-top:10px}
+.chat-outfit-card{display:flex;align-items:center;gap:10px;background:var(--cream);border:1px solid var(--border);border-radius:12px;padding:8px 12px}
+.chat-outfit-photo{width:40px;height:40px;border-radius:8px;object-fit:cover;flex-shrink:0}
+.chat-outfit-emoji{width:40px;height:40px;border-radius:8px;background:var(--blush);display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0}
+.chat-outfit-info h5{font-size:.8rem;font-weight:500;margin-bottom:1px}
+.chat-outfit-info p{font-size:.72rem;color:var(--mid-gray)}
+.typing-indicator{display:flex;gap:5px;padding:14px 16px;background:var(--warm-white);border:1px solid var(--border);border-radius:18px;border-bottom-left-radius:4px;width:fit-content}
+.typing-dot{width:7px;height:7px;border-radius:50%;background:var(--mid-gray);animation:typingBounce 1.2s infinite}
+.typing-dot:nth-child(2){animation-delay:.2s}
+.typing-dot:nth-child(3){animation-delay:.4s}
+@keyframes typingBounce{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-8px)}}
+.chat-input-wrap{display:flex;gap:10px;padding-top:16px;border-top:1px solid var(--border);margin-top:4px}
+.chat-input{flex:1;padding:12px 18px;border:1.5px solid var(--border);border-radius:30px;font-family:"DM Sans",sans-serif;font-size:.9rem;background:var(--cream);color:var(--charcoal);outline:none;transition:border-color .2s;resize:none}
+.chat-input:focus{border-color:var(--dusty-rose)}
+.chat-send-btn{width:44px;height:44px;border-radius:50%;background:var(--charcoal);color:white;border:none;cursor:pointer;font-size:1.1rem;display:flex;align-items:center;justify-content:center;transition:background .2s;flex-shrink:0}
+.chat-send-btn:hover{background:var(--dusty-rose)}
+.chat-send-btn:disabled{opacity:.5;cursor:not-allowed}
+.chat-suggestions{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:16px}
+.chat-sug{padding:7px 14px;border:1.5px solid var(--border);border-radius:30px;font-size:.78rem;cursor:pointer;background:var(--warm-white);color:var(--charcoal);transition:all .2s;font-family:"DM Sans",sans-serif}
+.chat-sug:hover{border-color:var(--dusty-rose);color:var(--dusty-rose)}
+
 @media(max-width:700px){
   nav{padding:14px 18px}
   .app{padding:20px 14px}
@@ -304,6 +338,7 @@ nav{display:flex;justify-content:space-between;align-items:center;padding:16px 4
     <button class="nav-tab" onclick="showSection('outfits',this)">✨ Get Outfit</button>
     <button class="nav-tab" onclick="showSection('mix',this)">🎨 Mix & Match</button>
     <button class="nav-tab" onclick="showSection('history',this)">📖 History</button>
+    <button class="nav-tab" onclick="showSection('chat',this)">💬 AI Stylist</button>
   </div>
   <div class="user-badge" id="user-badge" style="display:none">
     <span class="sync-dot" id="sync-dot"></span>
@@ -543,6 +578,44 @@ nav{display:flex;justify-content:space-between;align-items:center;padding:16px 4
   <div class="history-grid" id="history-grid"></div>
 </div>
 
+
+<!-- ═══ AI CHAT STYLIST ═══ -->
+<div class="section" id="section-chat">
+  <div class="page-header">
+    <h1>AI Stylist</h1>
+    <p>Chat naturally with your personal stylist — it knows your wardrobe!</p>
+  </div>
+
+  <div class="card" style="flex:1;display:flex;flex-direction:column">
+    <div class="chat-suggestions" id="chat-suggestions">
+      <button class="chat-sug" onclick="sendSuggestion(this)">I have a presentation tomorrow 💼</button>
+      <button class="chat-sug" onclick="sendSuggestion(this)">Going to a wedding this weekend 💍</button>
+      <button class="chat-sug" onclick="sendSuggestion(this)">What should I wear today? ☀️</button>
+      <button class="chat-sug" onclick="sendSuggestion(this)">Date night outfit 🌹</button>
+      <button class="chat-sug" onclick="sendSuggestion(this)">Something casual for college 🎓</button>
+      <button class="chat-sug" onclick="sendSuggestion(this)">Weekend trip to Lonavala 🏔️</button>
+    </div>
+
+    <div class="chat-wrap">
+      <div class="chat-messages" id="chat-messages">
+        <!-- Welcome message -->
+        <div class="chat-msg bot">
+          <div class="chat-avatar bot-av">D</div>
+          <div class="chat-bubble">
+            Hi! I'm your personal AI stylist 👗✨<br><br>
+            Tell me where you're going, what you're doing, or how you're feeling — and I'll pick the perfect outfit from <strong>your wardrobe</strong>!<br><br>
+            Try: <em>"I have a job interview tomorrow"</em> or <em>"Something comfy for a lazy Sunday"</em>
+          </div>
+        </div>
+      </div>
+
+      <div class="chat-input-wrap">
+        <input class="chat-input" id="chat-input" placeholder="Ask your stylist anything..." onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendChat()}">
+        <button class="chat-send-btn" id="chat-send" onclick="sendChat()">➤</button>
+      </div>
+    </div>
+  </div>
+</div>
 </div><!-- /app -->
 
 <!-- Toast -->
@@ -1265,6 +1338,143 @@ window.addEventListener('appinstalled', () => {
   toast('DRSS installed successfully! 🎉');
   document.getElementById('install-popup').classList.remove('show');
 });
+
+
+// ══════════════════════════════════════════════════════════
+// AI CHAT STYLIST
+// ══════════════════════════════════════════════════════════
+let chatHistory = [];
+
+function sendSuggestion(btn) {
+  document.getElementById('chat-input').value = btn.textContent.trim();
+  document.getElementById('chat-suggestions').style.display = 'none';
+  sendChat();
+}
+
+function sendChat() {
+  const input = document.getElementById('chat-input');
+  const msg = input.value.trim();
+  if (!msg) return;
+  if (wardrobe.length < 2) {
+    addChatMsg('bot', "Please add at least 2 clothes to your wardrobe first, then I can style you! 👗");
+    return;
+  }
+
+  input.value = '';
+  addChatMsg('user', msg);
+  chatHistory.push({ role: 'user', content: msg });
+  showTyping();
+
+  const wardrobeList = wardrobe.map(i =>
+    `- "${i.name}" (${i.category}, ${i.color}, ${i.style}, ${i.season})`
+  ).join('\n');
+
+  const systemPrompt = `You are DRSS, a warm, friendly, and expert personal fashion stylist. The user's wardrobe contains these items:
+${wardrobeList}
+
+RULES:
+- ONLY suggest clothes from the wardrobe list above
+- Be warm, friendly and conversational
+- When suggesting outfits, list each item on a new line starting with •
+- Format outfit items EXACTLY like: OUTFIT_ITEM:item name here (so the app can show photos)
+- Give a brief reason why the outfit works
+- If asked something not fashion related, gently redirect to fashion
+- Keep responses concise and friendly
+- If weather is mentioned, factor it in
+- Remember previous messages in the conversation`;
+
+  const messages = [
+    ...chatHistory.slice(-6) // keep last 6 messages for context
+  ];
+
+  fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      model: 'claude-sonnet-4-6',
+      max_tokens: 800,
+      system: systemPrompt,
+      messages: messages
+    })
+  })
+  .then(r => r.json())
+  .then(data => {
+    removeTyping();
+    const reply = data.content?.map(b => b.text || '').join('') || "Sorry, I couldn't think of an outfit right now. Try again!";
+    chatHistory.push({ role: 'assistant', content: reply });
+    addChatMsg('bot', reply);
+  })
+  .catch(() => {
+    removeTyping();
+    addChatMsg('bot', "Oops! Something went wrong. Please try again 😊");
+  });
+}
+
+function addChatMsg(role, text) {
+  const messages = document.getElementById('chat-messages');
+
+  // Parse outfit items from text
+  const lines = text.split('\n');
+  let html = '';
+  let outfitCards = '';
+
+  lines.forEach(line => {
+    if (line.startsWith('OUTFIT_ITEM:')) {
+      const itemName = line.replace('OUTFIT_ITEM:', '').trim();
+      const item = wardrobe.find(w => w.name.toLowerCase() === itemName.toLowerCase());
+      if (item) {
+        outfitCards += `
+          <div class="chat-outfit-card">
+            ${item.photo
+              ? `<img class="chat-outfit-photo" src="${item.photo}" alt="${item.name}">`
+              : `<div class="chat-outfit-emoji">${item.icon}</div>`
+            }
+            <div class="chat-outfit-info">
+              <h5>${item.name}</h5>
+              <p>${item.color} · ${item.category}</p>
+            </div>
+          </div>`;
+      }
+    } else {
+      // Clean up the line - remove bullet formatting
+      const cleanLine = line.replace(/^[•\-\*]\s*/, '').trim();
+      if (cleanLine) html += cleanLine + '<br>';
+    }
+  });
+
+  const bubble = `
+    <div class="chat-msg ${role}">
+      ${role === 'bot' ? '<div class="chat-avatar bot-av">D</div>' : '<div class="chat-avatar user-av">👤</div>'}
+      <div class="chat-bubble">
+        ${html}
+        ${outfitCards ? `<div class="outfit-cards">${outfitCards}</div>` : ''}
+      </div>
+    </div>`;
+
+  messages.innerHTML += bubble;
+  messages.scrollTop = messages.scrollHeight;
+}
+
+function showTyping() {
+  const messages = document.getElementById('chat-messages');
+  messages.innerHTML += `
+    <div class="chat-msg bot" id="typing-indicator">
+      <div class="chat-avatar bot-av">D</div>
+      <div class="typing-indicator">
+        <div class="typing-dot"></div>
+        <div class="typing-dot"></div>
+        <div class="typing-dot"></div>
+      </div>
+    </div>`;
+  messages.scrollTop = messages.scrollHeight;
+  document.getElementById('chat-send').disabled = true;
+}
+
+function removeTyping() {
+  const el = document.getElementById('typing-indicator');
+  if (el) el.remove();
+  document.getElementById('chat-send').disabled = false;
+}
 
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
